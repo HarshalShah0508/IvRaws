@@ -70,7 +70,7 @@ export function ShopPage() {
             placeholder="Search..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="w-full border-2 border-black px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full border-2 border-black dark:border-white dark:bg-neutral-900 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
 
@@ -79,7 +79,7 @@ export function ShopPage() {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full border-2 border-black px-2 py-1.5"
+            className="w-full border-2 border-black dark:border-white dark:bg-neutral-900 px-2 py-1.5"
           >
             <option value="">All</option>
             {categories.map((c) => (
@@ -98,8 +98,8 @@ export function ShopPage() {
                 key={s.id}
                 type="button"
                 onClick={() => setSize(size === s.label ? '' : s.label)}
-                className={`border-2 border-black px-2.5 py-1 text-xs font-bold ${
-                  size === s.label ? 'bg-black text-white' : 'hover:bg-gray-100'
+                className={`border-2 border-black dark:border-white px-2.5 py-1 text-xs font-bold ${
+                  size === s.label ? 'bg-black text-white dark:bg-white dark:text-black' : 'hover:bg-gray-100 dark:hover:bg-neutral-800'
                 }`}
               >
                 {s.label}
@@ -118,7 +118,7 @@ export function ShopPage() {
                 title={c.name}
                 onClick={() => setColor(color === c.name ? '' : c.name)}
                 className={`w-7 h-7 rounded-full border-2 ${
-                  color === c.name ? 'border-accent-dark ring-2 ring-black' : 'border-gray-300'
+                  color === c.name ? 'border-accent-dark ring-2 ring-black dark:ring-white' : 'border-gray-300 dark:border-gray-600'
                 }`}
                 style={{ backgroundColor: c.hexCode }}
               />
@@ -134,14 +134,14 @@ export function ShopPage() {
               placeholder="Min"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
-              className="w-full border-2 border-black px-2 py-1.5"
+              className="w-full border-2 border-black dark:border-white dark:bg-neutral-900 px-2 py-1.5"
             />
             <input
               type="number"
               placeholder="Max"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              className="w-full border-2 border-black px-2 py-1.5"
+              className="w-full border-2 border-black dark:border-white dark:bg-neutral-900 px-2 py-1.5"
             />
           </div>
         </div>
@@ -174,7 +174,7 @@ export function ShopPage() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            className="border-2 border-black px-3 py-2 text-xs font-bold uppercase tracking-wide"
+            className="border-2 border-black dark:border-white dark:bg-neutral-900 px-3 py-2 text-xs font-bold uppercase tracking-wide"
           >
             {SORT_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -184,9 +184,9 @@ export function ShopPage() {
           </select>
         </div>
 
-        {loading && <p className="text-gray-500">Loading...</p>}
-        {error && <p className="text-red-600">{error}</p>}
-        {!loading && !error && products.length === 0 && <p className="text-gray-500">No products match these filters.</p>}
+        {loading && <p className="text-gray-500 dark:text-gray-400">Loading...</p>}
+        {error && <p className="text-red-600 dark:text-red-400">{error}</p>}
+        {!loading && !error && products.length === 0 && <p className="text-gray-500 dark:text-gray-400">No products match these filters.</p>}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
           {products.map((product) => (

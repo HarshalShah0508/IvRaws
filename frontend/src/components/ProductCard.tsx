@@ -6,7 +6,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link to={`/products/${product.slug}`} className="group block">
-      <div className="aspect-[4/5] bg-gray-100 overflow-hidden relative">
+      <div className="aspect-[4/5] bg-gray-100 dark:bg-neutral-800 overflow-hidden relative">
         {image ? (
           <img
             src={image}
@@ -14,7 +14,7 @@ export function ProductCard({ product }: { product: Product }) {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">No image</div>
+          <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">No image</div>
         )}
         {product.isOnSale && (
           <span className="absolute top-2 left-2 bg-accent text-black text-xs font-bold uppercase tracking-wide px-2 py-1">
@@ -23,15 +23,15 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </div>
       <div className="mt-3">
-        <h3 className="text-sm font-medium text-gray-900 truncate">{product.name}</h3>
+        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{product.name}</h3>
         <div className="flex items-center gap-2 mt-1">
           <span className="text-sm font-bold">${product.basePrice}</span>
           {product.isOnSale && product.compareAtPrice && (
-            <span className="text-sm text-gray-400 line-through">${product.compareAtPrice}</span>
+            <span className="text-sm text-gray-400 dark:text-gray-500 line-through">${product.compareAtPrice}</span>
           )}
         </div>
         {product.reviewCount > 0 && (
-          <div className="text-xs text-gray-500 mt-0.5">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             <span className="text-accent-dark">★</span> {Number(product.avgRating).toFixed(1)} ({product.reviewCount})
           </div>
         )}

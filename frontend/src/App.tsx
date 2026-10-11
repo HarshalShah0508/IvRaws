@@ -13,7 +13,7 @@ import { RegisterPage } from './pages/RegisterPage.tsx';
 
 function App() {
   return (
-    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+    <div className="min-h-screen bg-white text-gray-900 dark:bg-neutral-950 dark:text-gray-100 flex flex-col transition-colors duration-300">
       <Navbar />
       <main className="flex-1">
         <Routes>

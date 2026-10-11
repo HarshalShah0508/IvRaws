@@ -51,7 +51,7 @@ export function ChatWidget() {
   return (
     <div className="fixed bottom-5 right-5 z-50">
       {open && (
-        <div className="mb-3 w-80 h-96 bg-white border-2 border-black shadow-xl flex flex-col overflow-hidden">
+        <div className="mb-3 w-80 h-96 bg-white border-2 border-black dark:bg-neutral-900 dark:border-white shadow-xl flex flex-col overflow-hidden">
           <div className="bg-black text-white px-4 py-3 flex items-center justify-between">
             <span className="font-display text-sm uppercase tracking-wide">IvRaws Support</span>
             <button type="button" onClick={() => setOpen(false)} className="text-white/70 hover:text-accent text-sm">
@@ -64,7 +64,9 @@ export function ChatWidget() {
               <div key={m.id} className={m.role === 'user' ? 'text-right' : 'text-left'}>
                 <span
                   className={`inline-block px-3 py-2 max-w-[85%] ${
-                    m.role === 'user' ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'
+                    m.role === 'user'
+                      ? 'bg-black text-white dark:bg-white dark:text-black'
+                      : 'bg-gray-100 text-gray-800 dark:bg-neutral-800 dark:text-gray-200'
                   }`}
                 >
                   {m.text}
@@ -76,7 +78,7 @@ export function ChatWidget() {
                         key={s.id}
                         type="button"
                         onClick={() => send(s.question)}
-                        className="text-xs border border-black px-2.5 py-1 hover:bg-accent transition-colors"
+                        className="text-xs border border-black dark:border-white dark:text-gray-100 hover:bg-accent hover:text-black px-2.5 py-1 transition-colors"
                       >
                         {s.question}
                       </button>
@@ -85,7 +87,7 @@ export function ChatWidget() {
                 )}
               </div>
             ))}
-            {sending && <div className="text-left text-gray-400 text-xs">Typing...</div>}
+            {sending && <div className="text-left text-gray-400 dark:text-gray-500 text-xs">Typing...</div>}
           </div>
 
           <form
@@ -93,19 +95,19 @@ export function ChatWidget() {
               e.preventDefault();
               send(input);
             }}
-            className="border-t-2 border-black flex"
+            className="border-t-2 border-black dark:border-white flex"
           >
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask a question..."
-              className="flex-1 px-3 py-2 text-sm outline-none"
+              className="flex-1 px-3 py-2 text-sm outline-none dark:bg-neutral-900 dark:text-gray-100 dark:placeholder:text-gray-500"
             />
             <button
               type="submit"
               disabled={sending}
-              className="px-4 text-xs font-bold uppercase tracking-wide text-black disabled:text-gray-400 hover:text-accent-dark"
+              className="px-4 text-xs font-bold uppercase tracking-wide text-black dark:text-white disabled:text-gray-400 dark:disabled:text-gray-600 hover:text-accent-dark"
             >
               Send
             </button>
@@ -116,7 +118,7 @@ export function ChatWidget() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-14 h-14 rounded-full bg-black text-white shadow-lg flex items-center justify-center text-xl hover:bg-accent hover:text-black transition-colors"
+        className="w-14 h-14 rounded-full bg-black text-white dark:bg-white dark:text-black shadow-lg flex items-center justify-center text-xl hover:bg-accent hover:text-black transition-colors"
         aria-label="Open support chat"
       >
         {open ? '✕' : '💬'}

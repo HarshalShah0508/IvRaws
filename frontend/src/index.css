@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Manual toggle, not the OS preference: dark: applies only under a .dark
+   class on <html>, set by ThemeContext. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-display: "Archivo Black", "Inter", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
@@ -13,7 +17,40 @@ body {
   background: #fff;
 }
 
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+html.dark body {
+  background: #0a0a0a;
+}
+
 ::selection {
   background: var(--color-accent);
   color: #000;
+}
+
+@keyframes kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+@keyframes kenburns-out {
+  from { transform: scale(1.1); }
+  to { transform: scale(1); }
+}
+
+.animate-kenburns {
+  animation: kenburns 24s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+.animate-kenburns-out {
+  animation: kenburns-out 24s ease-in-out infinite alternate;
+  transform-origin: center;
 }

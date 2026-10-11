@@ -1,90 +1,213 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { api } from '../lib/api.ts';
-import type { Category, Paginated, Product } from '../lib/types.ts';
-import { ProductCard } from '../components/ProductCard.tsx';
+import { useEffect, useRef, useState, useCallback, type CSSProperties } from 'react';
+import { useNavigate } from 'react-router-dom';
+import heroImg from '../assets/hero.webp';
+import editorial1Img from '../assets/editorial-1.webp';
+import editorial2Img from '../assets/editorial-2.webp';
+import editorial3Img from '../assets/editorial-3.webp';
+import editorial4Img from '../assets/editorial-4.webp';
 
-function ProductRow({ title, products, viewAllHref }: { title: string; products: Product[]; viewAllHref: string }) {
-  if (products.length === 0) return null;
-  return (
-    <section className="max-w-6xl mx-auto px-4 py-14">
-      <div className="flex items-end justify-between mb-6">
-        <h2 className="font-display text-2xl md:text-3xl uppercase">{title}</h2>
-        <Link to={viewAllHref} className="text-xs font-bold uppercase tracking-widest hover:text-accent-dark">
-          View All →
-        </Link>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
-      </div>
-    </section>
-  );
+const IMAGES = [
+  // The hero's headline used to be baked into the photo's own pixels, which
+  // blurs on upscale/high-DPI displays since it can never exceed the source
+  // image's native resolution. It's rendered as real HTML text now (crisp at
+  // any size) over a theme-aware panel, instead of relying on pixels in the
+  // image — see the panel comment in renderSlide for why.
+  { src: heroImg, alt: "IvRaws: Wear What's Next. Streetwear essentials built for movement.", objectPosition: 'left center', caption: null as string | null, hero: true },
+  { src: editorial1Img, alt: 'IvRaws streetwear editorial', objectPosition: 'center', caption: 'BUILT FOR MOVEMENT', hero: false },
+  { src: editorial2Img, alt: 'IvRaws streetwear editorial', objectPosition: 'center', caption: 'MADE TO STAND OUT', hero: false },
+  { src: editorial3Img, alt: 'IvRaws streetwear editorial', objectPosition: 'center', caption: 'BUILT TO WITHSTAND', hero: false },
+  { src: editorial4Img, alt: 'IvRaws streetwear editorial', objectPosition: 'center', caption: 'STAND APART', hero: false },
+];
+
+const TRANSITION_MS = 380;
+const LOCK_MS = 1600;
+const EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
+
+interface Transition {
+  from: number;
+  to: number;
+  dir: 1 | -1;
+  armed: boolean;
 }
 
+// PPT-style push slides: the outgoing image slides fully up and out while
+// the incoming one slides up into place from below, both on one short CSS
+// transform transition — a real "slide" motion, not a page scroll (the
+// document's own scrollY never moves while browsing slides) and not an
+// instant cut either. Only once past the last slide does real scrolling
+// take over, to reveal the footer below.
 export function HomePage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [bestSellers, setBestSellers] = useState<Product[]>([]);
-  const [onSale, setOnSale] = useState<Product[]>([]);
-  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+  const navigate = useNavigate();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [transition, setTransition] = useState<Transition | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const activeIndexRef = useRef(0);
+  const transitioningRef = useRef(false);
+  const lockRef = useRef(false);
 
-  useEffect(() => {
-    api.get<Category[]>('/categories').then(setCategories).catch(() => undefined);
-    api
-      .get<Paginated<Product>>('/products?sort=best_selling&limit=4')
-      .then((r) => setBestSellers(r.data))
-      .catch(() => undefined);
-    api
-      .get<Paginated<Product>>('/products?onSale=true&limit=4')
-      .then((r) => setOnSale(r.data))
-      .catch(() => undefined);
-    api
-      .get<Paginated<Product>>('/products?newArrivals=true&sort=newest&limit=4')
-      .then((r) => setNewArrivals(r.data))
-      .catch(() => undefined);
+  const stepTo = useCallback((dir: 1 | -1) => {
+    if (transitioningRef.current || lockRef.current) return;
+    const next = activeIndexRef.current + dir;
+    if (next < 0 || next > IMAGES.length - 1) return;
+
+    transitioningRef.current = true;
+    lockRef.current = true;
+    setTransition({ from: activeIndexRef.current, to: next, dir, armed: false });
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTransition((t) => (t ? { ...t, armed: true } : t));
+      });
+    });
+
+    window.setTimeout(() => {
+      activeIndexRef.current = next;
+      setActiveIndex(next);
+      setTransition(null);
+      transitioningRef.current = false;
+      window.setTimeout(() => {
+        lockRef.current = false;
+      }, LOCK_MS - TRANSITION_MS);
+    }, TRANSITION_MS);
   }, []);
 
-  return (
-    <div>
-      <section className="bg-black text-white">
-        <div className="max-w-6xl mx-auto px-4 py-24 md:py-32">
-          <h1 className="font-display text-5xl md:text-7xl leading-[0.95] uppercase">
-            Wear What&apos;s <span className="text-accent">Next</span>
-          </h1>
-          <p className="text-gray-400 mt-6 max-w-md text-lg">
-            Streetwear essentials built for movement. New drops, bold fits, zero compromise.
-          </p>
-          <Link
-            to="/shop"
-            className="inline-block mt-8 bg-accent text-black font-bold uppercase tracking-wide px-8 py-4 hover:bg-white transition-colors"
-          >
-            Shop Now
-          </Link>
-        </div>
-      </section>
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setMounted(true));
+    const n = IMAGES.length;
 
-      {categories.length > 0 && (
-        <section className="grid grid-cols-1 md:grid-cols-2">
-          {categories.map((c, i) => (
-            <Link
-              key={c.id}
-              to={`/shop?category=${c.slug}`}
-              className={`group flex items-center justify-center py-20 md:py-28 ${
-                i % 2 === 0 ? 'bg-gray-100' : 'bg-accent'
-              }`}
+    function onWheel(e: WheelEvent) {
+      const dir = e.deltaY > 0 ? 1 : e.deltaY < 0 ? -1 : 0;
+      if (!dir) return;
+
+      if (dir > 0 && activeIndexRef.current < n - 1) {
+        e.preventDefault();
+        stepTo(1);
+      } else if (dir < 0 && activeIndexRef.current > 0 && window.scrollY <= 2) {
+        e.preventDefault();
+        stepTo(-1);
+      }
+      // dir>0 at the last slide, or dir<0 while scrolled into the footer,
+      // falls through to native scrolling.
+    }
+
+    function onKeyDown(e: KeyboardEvent) {
+      const forward = e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ';
+      const back = e.key === 'ArrowUp' || e.key === 'PageUp';
+      if (!forward && !back) return;
+
+      if (forward && activeIndexRef.current < n - 1) {
+        e.preventDefault();
+        stepTo(1);
+      } else if (back && activeIndexRef.current > 0 && window.scrollY <= 2) {
+        e.preventDefault();
+        stepTo(-1);
+      }
+    }
+
+    window.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [stepTo]);
+
+  function slideStyle(role: 'active' | 'from' | 'to', dir?: 1 | -1, armed?: boolean): CSSProperties {
+    if (role === 'active') return { transform: 'translateY(0%)' };
+    const offscreen = dir === 1 ? '100%' : '-100%';
+    if (role === 'from') {
+      const exitTo = dir === 1 ? '-100%' : '100%';
+      return { transform: `translateY(${armed ? exitTo : '0%'})`, transition: `transform ${TRANSITION_MS}ms ${EASE}` };
+    }
+    return { transform: `translateY(${armed ? '0%' : offscreen})`, transition: `transform ${TRANSITION_MS}ms ${EASE}` };
+  }
+
+  function renderSlide(index: number, style: CSSProperties, captionVisible: boolean) {
+    const img = IMAGES[index];
+    return (
+      <div className="absolute inset-0 w-full h-full bg-neutral-950" style={style}>
+        <img
+          src={img.src}
+          alt={img.alt}
+          className={`absolute inset-0 w-full h-full object-cover pointer-events-none ${
+            img.hero ? '' : index % 2 === 1 ? 'animate-kenburns' : 'animate-kenburns-out'
+          }`}
+          style={{ objectPosition: img.objectPosition }}
+        />
+        {img.hero && (
+          <>
+            {/* Always dark, regardless of site theme — this panel's only job
+                is hiding the old baked-in headline pixels in the source
+                photo, so it must stay near-opaque through its first half. */}
+            <div
+              className="absolute inset-y-0 left-0 w-full pointer-events-none transition-opacity duration-300 ease-out"
+              style={{
+                opacity: captionVisible ? 1 : 0,
+                background: 'linear-gradient(to right, #0a0a0a 0%, #0a0a0a 33%, rgba(10,10,10,0) 39%)',
+              }}
+            />
+            <div
+              className="absolute top-1/2 left-6 md:left-12 right-6 max-w-md pointer-events-none transition-all duration-300 ease-out"
+              style={{ opacity: captionVisible ? 1 : 0, transform: `translateY(calc(-50% + ${captionVisible ? 0 : 16}px))` }}
             >
-              <span className="font-display text-3xl md:text-4xl uppercase group-hover:tracking-wide transition-all">
-                {c.name}
-              </span>
-            </Link>
-          ))}
-        </section>
-      )}
+              <h1 className="font-display uppercase leading-[0.95] text-white text-5xl md:text-7xl tracking-tight">
+                Wear
+                <br />
+                What&apos;s
+                <br />
+                <span className="text-accent">Next</span>
+              </h1>
+              <p className="mt-4 text-sm md:text-base text-gray-100 max-w-xs">
+                Streetwear essentials built for movement. New drops, bold fits, zero compromise.
+              </p>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/shop');
+                }}
+                className="pointer-events-auto mt-6 bg-accent text-black font-bold uppercase tracking-wide text-sm px-7 py-3 hover:bg-white transition-colors"
+              >
+                Shop Now
+              </button>
+            </div>
+          </>
+        )}
+        {img.caption && (
+          <>
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none transition-opacity duration-300 ease-out"
+              style={{ opacity: captionVisible ? 1 : 0 }}
+            />
+            <div
+              className="absolute bottom-24 left-6 md:left-12 pointer-events-none transition-all duration-300 ease-out"
+              style={{ opacity: captionVisible ? 1 : 0, transform: `translateY(${captionVisible ? 0 : 16}px)` }}
+            >
+              <div
+                className="h-0.5 bg-accent mb-3 transition-transform duration-300 ease-out"
+                style={{ width: 56, transform: `scaleX(${captionVisible ? 1 : 0})`, transformOrigin: 'left' }}
+              />
+              <p className="font-display text-2xl md:text-4xl text-white tracking-tight drop-shadow-lg">{img.caption}</p>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
 
-      <ProductRow title="Best Sellers" products={bestSellers} viewAllHref="/shop?sort=best_selling" />
-      <ProductRow title="On Sale" products={onSale} viewAllHref="/shop?onSale=true" />
-      <ProductRow title="New Arrivals" products={newArrivals} viewAllHref="/shop?newArrivals=true" />
+  return (
+    <div className="relative transition-opacity duration-1000 ease-out" style={{ opacity: mounted ? 1 : 0 }}>
+      <div className="relative h-screen w-full overflow-hidden cursor-pointer" onClick={() => navigate('/shop')}>
+        {transition
+          ? (
+            <>
+              {renderSlide(transition.from, slideStyle('from', transition.dir, transition.armed), !transition.armed)}
+              {renderSlide(transition.to, slideStyle('to', transition.dir, transition.armed), transition.armed)}
+            </>
+          )
+          : renderSlide(activeIndex, slideStyle('active'), true)}
+      </div>
     </div>
   );
 }

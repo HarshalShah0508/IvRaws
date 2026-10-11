@@ -83,14 +83,14 @@ export function CheckoutPage() {
   // without that split, this same empty-cart guard would otherwise replace
   // the whole page and hide the result message right as it's about to show.
   if ((!cart || cart.items.length === 0) && !orderPlaced) {
-    return <div className="max-w-xl mx-auto px-4 py-12 text-gray-500">Your cart is empty.</div>;
+    return <div className="max-w-xl mx-auto px-4 py-12 text-gray-500 dark:text-gray-400">Your cart is empty.</div>;
   }
 
   if (orderPlaced) {
     return (
       <div className="max-w-xl mx-auto px-4 py-16">
         <h1 className="font-display text-3xl uppercase mb-4">Checkout</h1>
-        <p className="text-gray-700">{message}</p>
+        <p className="text-gray-700 dark:text-gray-300">{message}</p>
       </div>
     );
   }
@@ -103,7 +103,7 @@ export function CheckoutPage() {
       {addresses.map((addr) => (
         <label
           key={addr.id}
-          className="flex items-start gap-2 mb-2 text-sm border-2 border-black p-3 cursor-pointer has-checked:bg-gray-50"
+          className="flex items-start gap-2 mb-2 text-sm border-2 border-black dark:border-white p-3 cursor-pointer has-checked:bg-gray-50 dark:has-checked:bg-neutral-800"
         >
           <input
             type="radio"
@@ -132,13 +132,13 @@ export function CheckoutPage() {
               placeholder={field}
               value={form[field]}
               onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))}
-              className="border-2 border-black px-2 py-1.5 col-span-1"
+              className="border-2 border-black dark:border-white dark:bg-neutral-900 px-2 py-1.5 col-span-1"
             />
           ))}
           <button
             type="button"
             onClick={handleCreateAddress}
-            className="col-span-2 bg-black text-white font-bold uppercase tracking-wide py-2.5 mt-1 hover:bg-accent hover:text-black transition-colors"
+            className="col-span-2 bg-black text-white dark:bg-white dark:text-black font-bold uppercase tracking-wide py-2.5 mt-1 hover:bg-accent hover:text-black transition-colors"
           >
             Save address
           </button>
@@ -154,12 +154,12 @@ export function CheckoutPage() {
         type="button"
         onClick={handlePlaceOrder}
         disabled={placing}
-        className="w-full bg-black text-white py-4 font-bold uppercase tracking-wide hover:bg-accent hover:text-black transition-colors disabled:bg-gray-400 disabled:text-white"
+        className="w-full bg-black text-white dark:bg-white dark:text-black py-4 font-bold uppercase tracking-wide hover:bg-accent hover:text-black transition-colors disabled:bg-gray-400 disabled:text-white dark:disabled:bg-neutral-700 dark:disabled:text-gray-300"
       >
         {placing ? 'Placing order...' : 'Place order'}
       </button>
 
-      {message && <p className="text-sm mt-4 text-gray-700">{message}</p>}
+      {message && <p className="text-sm mt-4 text-gray-700 dark:text-gray-300">{message}</p>}
     </div>
   );
 }

@@ -13,7 +13,7 @@ export function CartPage() {
         <p className="font-display text-2xl uppercase mb-3">Your cart is empty</p>
         <Link
           to="/shop"
-          className="inline-block mt-2 bg-black text-white px-6 py-3 font-bold uppercase tracking-wide text-sm hover:bg-accent hover:text-black transition-colors"
+          className="inline-block mt-2 bg-black text-white dark:bg-white dark:text-black px-6 py-3 font-bold uppercase tracking-wide text-sm hover:bg-accent hover:text-black transition-colors"
         >
           Continue Shopping
         </Link>
@@ -26,15 +26,15 @@ export function CartPage() {
       <h1 className="font-display text-3xl uppercase mb-8">Your Cart</h1>
       <div className="space-y-5">
         {cart.items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between border-b-2 border-black pb-5">
+          <div key={item.id} className="flex items-center justify-between border-b-2 border-black dark:border-white pb-5">
             <div>
               <Link to={`/products/${item.product.slug}`} className="font-bold hover:text-accent-dark">
                 {item.product.name}
               </Link>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {item.size} / {item.color} — {item.sku}
               </p>
-              <p className="text-sm text-gray-500">${item.unitPrice} each</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">${item.unitPrice} each</p>
             </div>
             <div className="flex items-center gap-4">
               <input
@@ -43,13 +43,13 @@ export function CartPage() {
                 max={item.availableStock}
                 value={item.quantity}
                 onChange={(e) => updateItem(item.id, Number(e.target.value))}
-                className="w-16 border-2 border-black px-2 py-1.5 text-center"
+                className="w-16 border-2 border-black dark:border-white dark:bg-neutral-900 px-2 py-1.5 text-center"
               />
               <span className="font-bold w-16 text-right">${item.lineTotal.toFixed(2)}</span>
               <button
                 type="button"
                 onClick={() => removeItem(item.id)}
-                className="text-gray-400 hover:text-black text-xs font-bold uppercase tracking-wide"
+                className="text-gray-400 hover:text-black dark:text-gray-500 dark:hover:text-white text-xs font-bold uppercase tracking-wide"
               >
                 Remove
               </button>
@@ -66,7 +66,7 @@ export function CartPage() {
       <button
         type="button"
         onClick={() => navigate(user ? '/checkout' : '/login')}
-        className="mt-6 w-full bg-black text-white py-4 font-bold uppercase tracking-wide hover:bg-accent hover:text-black transition-colors"
+        className="mt-6 w-full bg-black text-white dark:bg-white dark:text-black py-4 font-bold uppercase tracking-wide hover:bg-accent hover:text-black transition-colors"
       >
         {user ? 'Checkout' : 'Login to Checkout'}
       </button>
