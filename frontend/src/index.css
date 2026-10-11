@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Archivo Black", "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --color-accent: #d7ff3d;
+  --color-accent-dark: #a8cc00;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: #fff;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #000;
+}
