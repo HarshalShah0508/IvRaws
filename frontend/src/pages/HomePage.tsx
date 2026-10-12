@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, useCallback, type CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
-import heroImg from '../assets/hero.webp';
+import { Link, useNavigate } from 'react-router-dom';
 import editorial1Img from '../assets/editorial-1.webp';
-import editorial2Img from '../assets/editorial-2.webp';
 import editorial3Img from '../assets/editorial-3.webp';
-import editorial4Img from '../assets/editorial-4.webp';
+import editorial6Img from '../assets/editorial-6.webp';
+import { api } from '../lib/api.ts';
+import type { Paginated, Product } from '../lib/types.ts';
+import { ProductCard } from '../components/ProductCard.tsx';
+import { useHeroSlide } from '../context/HeroSlideContext.tsx';
 
 const IMAGES = [
   // The hero's headline used to be baked into the photo's own pixels, which
@@ -12,15 +14,13 @@ const IMAGES = [
   // image's native resolution. It's rendered as real HTML text now (crisp at
   // any size) over a theme-aware panel, instead of relying on pixels in the
   // image — see the panel comment in renderSlide for why.
-  { src: heroImg, alt: "IvRaws: Wear What's Next. Streetwear essentials built for movement.", objectPosition: 'left center', caption: null as string | null, hero: true },
-  { src: editorial1Img, alt: 'IvRaws streetwear editorial', objectPosition: 'center', caption: 'BUILT FOR MOVEMENT', hero: false },
-  { src: editorial2Img, alt: 'IvRaws streetwear editorial', objectPosition: 'center', caption: 'MADE TO STAND OUT', hero: false },
+  { src: editorial6Img, alt: "IvRaws: Wear What's Next. Streetwear essentials built for movement.", objectPosition: 'center', caption: null as string | null, hero: true },
+  { src: editorial1Img, alt: 'IvRaws streetwear editorial', objectPosition: 'center', caption: null as string | null, hero: false },
   { src: editorial3Img, alt: 'IvRaws streetwear editorial', objectPosition: 'center', caption: 'BUILT TO WITHSTAND', hero: false },
-  { src: editorial4Img, alt: 'IvRaws streetwear editorial', objectPosition: 'center', caption: 'STAND APART', hero: false },
 ];
 
-const TRANSITION_MS = 380;
-const LOCK_MS = 1600;
+const TRANSITION_MS = 350;
+const LOCK_MS = 1250;
 const EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
 
 interface Transition {
@@ -44,6 +44,23 @@ export function HomePage() {
   const activeIndexRef = useRef(0);
   const transitioningRef = useRef(false);
   const lockRef = useRef(false);
+  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+  const { setPastFirstSlide } = useHeroSlide();
+
+  useEffect(() => {
+    api
+      .get<Paginated<Product>>('/products?newArrivals=true&limit=8')
+      .then((result) => setNewArrivals(result.data))
+      .catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    setPastFirstSlide(activeIndex > 0);
+  }, [activeIndex, setPastFirstSlide]);
+
+  useEffect(() => {
+    return () => setPastFirstSlide(false);
+  }, [setPastFirstSlide]);
 
   const stepTo = useCallback((dir: 1 | -1) => {
     if (transitioningRef.current || lockRef.current) return;
@@ -141,14 +158,14 @@ export function HomePage() {
                 is hiding the old baked-in headline pixels in the source
                 photo, so it must stay near-opaque through its first half. */}
             <div
-              className="absolute inset-y-0 left-0 w-full pointer-events-none transition-opacity duration-300 ease-out"
+              className="absolute inset-y-0 right-0 w-full pointer-events-none transition-opacity duration-300 ease-out"
               style={{
                 opacity: captionVisible ? 1 : 0,
-                background: 'linear-gradient(to right, #0a0a0a 0%, #0a0a0a 33%, rgba(10,10,10,0) 39%)',
+                background: 'linear-gradient(to left, #0a0a0a 0%, #0a0a0a 33%, rgba(10,10,10,0) 39%)',
               }}
             />
             <div
-              className="absolute top-1/2 left-6 md:left-12 right-6 max-w-md pointer-events-none transition-all duration-300 ease-out"
+              className="absolute top-1/2 right-6 md:right-12 left-6 max-w-md ml-auto text-right pointer-events-none transition-all duration-300 ease-out"
               style={{ opacity: captionVisible ? 1 : 0, transform: `translateY(calc(-50% + ${captionVisible ? 0 : 16}px))` }}
             >
               <h1 className="font-display uppercase leading-[0.95] text-white text-5xl md:text-7xl tracking-tight">
@@ -158,7 +175,7 @@ export function HomePage() {
                 <br />
                 <span className="text-accent">Next</span>
               </h1>
-              <p className="mt-4 text-sm md:text-base text-gray-100 max-w-xs">
+              <p className="mt-4 text-sm md:text-base text-gray-100 max-w-xs ml-auto">
                 Streetwear essentials built for movement. New drops, bold fits, zero compromise.
               </p>
               <button
@@ -208,6 +225,25 @@ export function HomePage() {
           )
           : renderSlide(activeIndex, slideStyle('active'), true)}
       </div>
+
+      {newArrivals.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 py-16">
+          <h2 className="font-display text-3xl uppercase mb-8">New Arrivals</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            {newArrivals.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+          <div className="flex justify-center mt-10">
+            <Link
+              to="/shop"
+              className="bg-accent text-black font-bold uppercase tracking-wide text-sm px-7 py-3 hover:bg-white transition-colors"
+            >
+              Shop All
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

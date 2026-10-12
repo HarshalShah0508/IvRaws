@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { api, ApiError } from '../lib/api.ts';
 import type { Product, Review } from '../lib/types.ts';
 import { useCart } from '../context/CartContext.tsx';
+import { formatPrice } from '../lib/currency.ts';
 
 export function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -86,9 +87,9 @@ export function ProductDetailPage() {
           </div>
         )}
         <div className="flex items-center gap-3 mt-4">
-          <span className="text-2xl font-bold">${matchingVariant?.price ?? product.basePrice}</span>
+          <span className="text-2xl font-bold">{formatPrice(matchingVariant?.price ?? product.basePrice)}</span>
           {product.isOnSale && product.compareAtPrice && (
-            <span className="text-lg text-gray-400 dark:text-gray-500 line-through">${product.compareAtPrice}</span>
+            <span className="text-lg text-gray-400 dark:text-gray-500 line-through">{formatPrice(product.compareAtPrice)}</span>
           )}
         </div>
         <p className="text-gray-600 dark:text-gray-400 mt-4 text-sm">{product.description}</p>

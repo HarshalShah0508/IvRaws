@@ -95,8 +95,7 @@ export class OrdersService {
     );
 
     const gateway = dto.gateway ?? PaymentGateway.STRIPE;
-    const currency = gateway === PaymentGateway.RAZORPAY ? 'inr' : 'usd';
-    const payment = await this.paymentsService.initiatePayment(order, gateway, currency);
+    const payment = await this.paymentsService.initiatePayment(order, gateway, 'inr');
 
     return { order, payment };
   }

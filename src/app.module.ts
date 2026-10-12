@@ -43,6 +43,8 @@ import { RolesGuard } from './modules/auth/guards/roles.guard.js';
         connection: {
           host: configService.get<string>('redis.host'),
           port: configService.get<number>('redis.port'),
+          password: configService.get<string | undefined>('redis.password'),
+          tls: configService.get<boolean>('redis.tls') ? {} : undefined,
         },
       }),
     }),

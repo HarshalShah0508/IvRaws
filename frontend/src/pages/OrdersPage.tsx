@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api.ts';
 import type { Order } from '../lib/types.ts';
+import { formatPrice } from '../lib/currency.ts';
 
 const STATUS_STYLES: Record<string, string> = {
   PAID: 'bg-accent text-black',
@@ -52,7 +53,7 @@ export function OrdersPage() {
                 </li>
               ))}
             </ul>
-            <p className="font-bold mt-3">Total: ${order.total}</p>
+            <p className="font-bold mt-3">Total: {formatPrice(order.total)}</p>
           </div>
         ))}
       </div>

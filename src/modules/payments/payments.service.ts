@@ -25,7 +25,7 @@ export class PaymentsService {
     private readonly gatewayFactory: PaymentGatewayFactory,
   ) {}
 
-  async initiatePayment(order: OrderForPayment, gateway: PaymentGateway, currency = 'usd') {
+  async initiatePayment(order: OrderForPayment, gateway: PaymentGateway, currency = 'inr') {
     const strategy = this.gatewayFactory.getGateway(gateway);
     const result = await strategy.createPaymentIntent({
       amount: Number(order.total),

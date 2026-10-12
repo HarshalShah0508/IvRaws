@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api, ApiError } from '../lib/api.ts';
 import type { Address } from '../lib/types.ts';
 import { useCart } from '../context/CartContext.tsx';
+import { formatPrice } from '../lib/currency.ts';
 
 export function CheckoutPage() {
   const { cart, refresh } = useCart();
@@ -16,7 +17,7 @@ export function CheckoutPage() {
     city: '',
     state: '',
     postalCode: '',
-    country: 'US',
+    country: 'IN',
     phone: '',
   });
   const [placing, setPlacing] = useState(false);
@@ -65,8 +66,8 @@ export function CheckoutPage() {
       if (err instanceof ApiError) {
         setOrderPlaced(true);
         setMessage(
-          `Order was created and stock reserved, but the payment step failed: "${err.message}". ` +
-            'This is expected until a real Stripe/Razorpay test key is set in the backend .env.',
+          "Order placed and stock reserved — live payment isn't enabled in this sample yet, " +
+            'so the payment step was skipped. Your order is saved and visible under Orders.',
         );
         await refresh();
       } else {
@@ -125,11 +126,21 @@ export function CheckoutPage() {
       </button>
 
       {showNewAddressForm && (
-        <div className="grid grid-cols-2 gap-2 mb-6 text-sm">
-          {(['fullName', 'line1', 'city', 'state', 'postalCode', 'country', 'phone'] as const).map((field) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6 text-sm">
+          {(
+            [
+              ['fullName', 'Full name'],
+              ['line1', 'Address line 1'],
+              ['city', 'City'],
+              ['state', 'State'],
+              ['postalCode', 'Postal code'],
+              ['country', 'Country'],
+              ['phone', 'Phone'],
+            ] as const
+          ).map(([field, label]) => (
             <input
               key={field}
-              placeholder={field}
+              placeholder={label}
               value={form[field]}
               onChange={(e) => setForm((f) => ({ ...f, [field]: e.target.value }))}
               className="border-2 border-black dark:border-white dark:bg-neutral-900 px-2 py-1.5 col-span-1"
@@ -147,7 +158,7 @@ export function CheckoutPage() {
 
       <div className="flex items-center justify-between text-xl font-bold mb-5 mt-6">
         <span className="uppercase text-sm tracking-widest">Total</span>
-        <span>${(cart?.subtotal ?? 0).toFixed(2)}</span>
+        <span>{formatPrice(cart?.subtotal ?? 0)}</span>
       </div>
 
       <button

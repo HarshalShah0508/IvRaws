@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.tsx';
 import { useAuth } from '../context/AuthContext.tsx';
+import { formatPrice } from '../lib/currency.ts';
 
 export function CartPage() {
   const { cart, updateItem, removeItem } = useCart();
@@ -34,7 +35,7 @@ export function CartPage() {
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {item.size} / {item.color} — {item.sku}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">${item.unitPrice} each</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{formatPrice(item.unitPrice)} each</p>
             </div>
             <div className="flex items-center gap-4">
               <input
@@ -45,7 +46,7 @@ export function CartPage() {
                 onChange={(e) => updateItem(item.id, Number(e.target.value))}
                 className="w-16 border-2 border-black dark:border-white dark:bg-neutral-900 px-2 py-1.5 text-center"
               />
-              <span className="font-bold w-16 text-right">${item.lineTotal.toFixed(2)}</span>
+              <span className="font-bold w-16 text-right">{formatPrice(item.lineTotal)}</span>
               <button
                 type="button"
                 onClick={() => removeItem(item.id)}
@@ -60,7 +61,7 @@ export function CartPage() {
 
       <div className="flex items-center justify-between mt-8 text-xl font-bold">
         <span className="uppercase text-sm tracking-widest font-bold">Subtotal</span>
-        <span>${cart.subtotal.toFixed(2)}</span>
+        <span>{formatPrice(cart.subtotal)}</span>
       </div>
 
       <button

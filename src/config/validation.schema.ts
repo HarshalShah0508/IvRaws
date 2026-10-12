@@ -15,6 +15,8 @@ const schema = Joi.object({
 
   REDIS_HOST: Joi.string().required(),
   REDIS_PORT: Joi.number().default(6379),
+  REDIS_PASSWORD: Joi.string().allow('').optional(),
+  REDIS_TLS: Joi.boolean().default(false),
 
   S3_ENDPOINT: Joi.string().required(),
   S3_REGION: Joi.string().required(),
