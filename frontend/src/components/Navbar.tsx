@@ -1,58 +1,21 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
 import { useCart } from '../context/CartContext.tsx';
 import { useTheme } from '../context/ThemeContext.tsx';
-import { useHeroSlide } from '../context/HeroSlideContext.tsx';
 import { IvrawsLogo } from './IvrawsLogo.tsx';
-
-const HIDE_THRESHOLD_PX = 80;
 
 export function Navbar() {
   const { user, logout } = useAuth();
   const { itemCount } = useCart();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const { pastFirstSlide } = useHeroSlide();
-  const [hidden, setHidden] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const lastScrollY = useRef(0);
-
-  // While browsing the homepage hero's 2nd/3rd slide, the page itself never
-  // actually scrolls (HomePage intercepts wheel/keyboard input to drive the
-  // slideshow instead) — so the scroll listener below never fires and never
-  // hides the bar on its own. This covers that case directly: still parked
-  // at the top of the hero (scrollY ~0) but past slide 1.
-  const heroForcedHidden = pastFirstSlide && window.scrollY <= 2;
-
-  useEffect(() => {
-    function onScroll() {
-      const y = window.scrollY;
-      if (y <= HIDE_THRESHOLD_PX) {
-        setHidden(false);
-      } else if (y > lastScrollY.current) {
-        setHidden(true);
-      } else if (y < lastScrollY.current) {
-        setHidden(false);
-      }
-      lastScrollY.current = y;
-    }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   const closeMenu = () => setMobileMenuOpen(false);
 
   return (
-    <header
-      // Hiding this via `transform: translateY()` would only move it visually —
-      // transforms don't affect layout, so the bar's reserved space in the page
-      // flow would stay put and show up as a blank gap above whatever's below it.
-      // `max-height` collapse genuinely removes that space when hidden.
-      className={`sticky top-0 z-40 overflow-hidden bg-white border-black dark:bg-neutral-950 dark:border-white transition-all duration-300 ${
-        (hidden || heroForcedHidden) && !mobileMenuOpen ? 'max-h-0 border-b-0' : 'max-h-[500px] border-b-2'
-      }`}
-    >
+    <header className="sticky top-0 z-40 bg-white border-b-2 border-black dark:bg-neutral-950 dark:border-white">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-4">
         <Link to="/" className="text-black dark:text-white" aria-label="IvRaws home" onClick={closeMenu}>
           <IvrawsLogo className="h-7 w-auto" />

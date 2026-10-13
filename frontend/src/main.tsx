@@ -6,7 +6,6 @@ import App from './App.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 import { CartProvider } from './context/CartContext.tsx'
 import { ThemeProvider } from './context/ThemeContext.tsx'
-import { HeroSlideProvider } from './context/HeroSlideContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -14,9 +13,7 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <AuthProvider>
           <CartProvider>
-            <HeroSlideProvider>
-              <App />
-            </HeroSlideProvider>
+            <App />
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>

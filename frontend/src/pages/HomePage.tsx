@@ -6,7 +6,6 @@ import editorial6Img from '../assets/editorial-6.webp';
 import { api } from '../lib/api.ts';
 import type { Paginated, Product } from '../lib/types.ts';
 import { ProductCard } from '../components/ProductCard.tsx';
-import { useHeroSlide } from '../context/HeroSlideContext.tsx';
 
 const IMAGES = [
   // The hero's headline used to be baked into the photo's own pixels, which
@@ -45,7 +44,6 @@ export function HomePage() {
   const transitioningRef = useRef(false);
   const lockRef = useRef(false);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
-  const { setPastFirstSlide } = useHeroSlide();
 
   useEffect(() => {
     api
@@ -53,14 +51,6 @@ export function HomePage() {
       .then((result) => setNewArrivals(result.data))
       .catch(() => undefined);
   }, []);
-
-  useEffect(() => {
-    setPastFirstSlide(activeIndex > 0);
-  }, [activeIndex, setPastFirstSlide]);
-
-  useEffect(() => {
-    return () => setPastFirstSlide(false);
-  }, [setPastFirstSlide]);
 
   const stepTo = useCallback((dir: 1 | -1) => {
     if (transitioningRef.current || lockRef.current) return;
