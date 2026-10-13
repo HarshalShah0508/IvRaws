@@ -18,8 +18,8 @@ const IMAGES = [
   { src: editorial3Img, alt: 'IvRaws streetwear editorial', objectPosition: 'center', caption: 'BUILT TO WITHSTAND', hero: false },
 ];
 
-const TRANSITION_MS = 350;
-const LOCK_MS = 1250;
+const TRANSITION_MS = 300;
+const LOCK_MS = 1000;
 const EASE = 'cubic-bezier(0.65, 0, 0.35, 1)';
 
 interface Transition {
